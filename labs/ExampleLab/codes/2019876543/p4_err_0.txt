@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\autoeval\labs\ExampleLab\codes\2019876543\p4.py", line 1, in <module>
+    print(bar)
+NameError: name 'bar' is not defined
