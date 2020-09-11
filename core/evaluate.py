@@ -2,6 +2,7 @@ import re
 import os
 import subprocess
 from difflib import SequenceMatcher
+from core.score_definition import *
 
 from core.writer import HTMLWriter, CSVWriter
 
@@ -31,7 +32,7 @@ class Result:
         return len(self.container)
     
     def perfect(self):
-        return self.get_score() == self.length()
+        return self.get_score() == 3 * self.length()
 
 
 class ResultContainer:
@@ -122,7 +123,7 @@ class Evaluator:
                 except:
                     # No code exists
                     for case_idx in range(num_case):
-                        result.add_result(filename, case_idx, 0, "파일 미제출")
+                        result.add_result(filename, case_idx, NO_FILE_SCORE, "파일 미제출")
                     continue
 
                 try:
@@ -140,13 +141,13 @@ class Evaluator:
                 for kwd in banned:
                     if kwd.strip() in codes:
                         for case_idx in range(num_case):
-                            result.add_result(filename, case_idx, 0, f"금지 키워드({kwd}) 사용", code=codes)
+                            result.add_result(filename, case_idx, BANNED_KWD_SCORE, f"금지 키워드({kwd}) 사용", code=codes)
                         continue
                 
                 for kwd in required:
                     if kwd.strip() not in codes:
                         for case_idx in range(num_case):
-                            result.add_result(filename, case_idx, 0, f"필수 키워드({kwd}) 미사용", code=codes)
+                            result.add_result(filename, case_idx, NO_REQUIRED_KWD_SCORE, f"필수 키워드({kwd}) 미사용", code=codes)
                         continue
 
                 for case_idx in range(num_case):
@@ -161,16 +162,16 @@ class Evaluator:
                     try:
                         target, err = self.__run(filepath, inputdir, outputdir, errdir, self.kill_timeout)
                     except TimeoutError:
-                        result.add_result(filename, case_idx, 0, f"무한루프(실행 시간 {self.kill_timeout}s 초과)", code=codes)
+                        result.add_result(filename, case_idx, INF_LOOP_SCORE, f"무한루프(실행 시간 {self.kill_timeout}s 초과)", code=codes)
                         continue
 
                     diff = comparator.get_diff(ans, target)
                     if (diff == None):
-                        result.add_result(filename, case_idx, 1)
+                        result.add_result(filename, case_idx, PROBLEM_MAX_SCORE)
                     elif err:
-                        result.add_result(filename, case_idx, 0, "실행 중 오류 발생", diff=diff, ans=ans, code=codes, err=err)
+                        result.add_result(filename, case_idx, STDOUT_ERR_SCORE, "실행 중 오류 발생", diff=diff, ans=ans, code=codes, err=err)
                     else:
-                        result.add_result(filename, case_idx, 0, "실행 결과 불일치", diff=diff, ans=ans, code=codes)
+                        result.add_result(filename, case_idx, INTERPRET_ERR_SCORE, "실행 결과 불일치", diff=diff, ans=ans, code=codes) # 일반적으로 2점
             
             self.results.append(result)
     

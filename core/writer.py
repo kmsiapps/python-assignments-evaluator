@@ -1,4 +1,5 @@
 import csv
+from core.score_definition import *
 
 class Writer:
     def __init__(self, filename):
@@ -27,14 +28,15 @@ class HTMLWriter(Writer):
                 else:
                     label_suffix = 'warning'
                     show_details = True
-                acc.append(f'<h4 class="problem-no">{problem}'
-                           f'<span class="problem-score label label-{label_suffix}">{individuals[problem].get_score()}/{individuals[problem].length()}'
+                acc.append(f'<h4 class="problem-no">{problem}' +
+                           '<span class="problem-score label label-{}">{:.2f}/{}'.format(
+                                         label_suffix, individuals[problem].get_score()/PROBLEM_MAX_SCORE, individuals[problem].length()) +
                             '</span></h4>')
                 if (show_details):
                     acc.append('<div class="problem-details">')
                     for case_idx, case in enumerate(individuals[problem]):
                         score, reason, diff, ans, code, err = individuals[problem][case]
-                        if (score == 1):
+                        if (score == 3):
                             continue
                         acc.append(f'<div class="problem-result"><span class="label label-danger">#{case_idx} {reason}</span></div>')
                         if (diff):
@@ -83,16 +85,14 @@ class CSVWriter(Writer):
         header += ['감점 사유']
 
         self.content.append(header)
-        MAX_SCORE = 3
-
         for individuals in results:
             content = [individuals.get_name()] # 학번
 
             total_scores = list(individuals[problem].get_score(max_score=1) for problem in individuals)
-            content += [sum(total_scores) / len(total_scores) * MAX_SCORE] #총점
+            content += [sum(total_scores) / len(total_scores) / PROBLEM_MAX_SCORE * TOTAL_MAX_SCORE] #총점
 
+            reasons = []
             for problem in individuals:
-                reasons = []
                 content += [individuals[problem].get_score()] # Pn 총점
                 for case in individuals[problem]:
                     score, reason, _, _, _, _ = individuals[problem][case]
