@@ -34,8 +34,11 @@ class HTMLWriter(Writer):
                             '</span></h4>')
                 if (show_details):
                     acc.append('<div class="problem-details">')
+                    code = None
                     for case_idx, case in enumerate(individuals[problem]):
-                        score, reason, diff, ans, code, err = individuals[problem][case]
+                        score, reason, diff, ans, __code, err = individuals[problem][case]
+                        if __code:
+                            code = __code
                         if (score == 3):
                             continue
                         acc.append(f'<div class="problem-result"><span class="label label-danger">#{case_idx} {reason}</span></div>')
