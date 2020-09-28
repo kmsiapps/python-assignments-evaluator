@@ -14,6 +14,9 @@ class Writer:
 
 
 class HTMLWriter(Writer):
+    def to_html_char(self, string):
+        return string.replace('<', '&lt;').replace('>', '&gt;')
+    
     def write(self, results):
         acc = []
         acc.append('<div class="body-wrapper">')
@@ -47,9 +50,9 @@ class HTMLWriter(Writer):
                         if (ans):
                             acc.append(f'<pre class="ans-box">{ans}</pre>')
                         if (err):
-                            acc.append(f'<pre class="alert alert-danger">{err}</pre>')
+                            acc.append(f'<pre class="alert alert-danger">{self.to_html_char(err)}</pre>')
                     if (code):
-                        acc.append(f'<details><summary>코드 보기</summary><pre class="code-box">{code}</pre></details>')
+                        acc.append(f'<details><summary>코드 보기</summary><pre class="code-box">{self.to_html_char(code)}</pre></details>')
                     acc.append('</div>')
                 acc.append('</div>')
             acc.append('<hr></div>')
@@ -78,13 +81,13 @@ class CSVWriter(Writer):
         if len(results) == 0:
             return
         
-        problem_lsts = list(results[0][key].length() for key in results[0])
+        problem_lsts = list((key, results[0][key].length()) for key in results[0])
         # ['학번', '총점', 'P1', 'P1 #0', ..., 'P1 #N', 'P2', 'P2 #0', ..., 'P2 #M', '감점 사유']
         header = ['학번', '총점']
-        for problem_idx, total_cases in enumerate(problem_lsts):
-            header.append(f'P{problem_idx}')
+        for problem_idx, total_cases in problem_lsts:
+            header.append(f'{problem_idx}')
             for case_num in range(total_cases):
-                header.append(f'P{problem_idx} #{case_num}')
+                header.append(f'{problem_idx} #{case_num}')
         header += ['감점 사유']
 
         self.content.append(header)

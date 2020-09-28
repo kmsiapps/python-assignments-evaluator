@@ -3,7 +3,6 @@ import os
 import subprocess
 from difflib import SequenceMatcher
 from core.score_definition import *
-
 from core.writer import HTMLWriter, CSVWriter
 
 class Result:
@@ -110,13 +109,36 @@ class Evaluator:
 
     def evaluate(self, comparator):
         rootdir = os.path.join(os.getcwd(), 'labs', self.labname)
+
+        banned = [[] for _ in self.files]
+        required = [[] for _ in self.files]
+
+        for idx, file in enumerate(self.files):
+            filename, _ = file
+            banned_kwd_dir = os.path.join(rootdir, 'src', "{}_ban_keyword.txt".format(filename))
+            required_kwd_dir = os.path.join(rootdir, 'src', "{}_req_keyword.txt".format(filename))
+            try:
+                with open(banned_kwd_dir) as f:
+                    keywords = f.readlines()
+                    banned[idx] = [x.strip() for x in keywords]
+            except:
+                pass
+
+            try:
+                with open(required_kwd_dir) as f:
+                    keywords = f.readlines()
+                    required[idx] = [x.strip() for x in keywords]
+            except:
+                pass
+                    
         for dir in self.dirs:
             result = ResultContainer(dir)
-            for filename, num_case in self.files:
+            for idx, file in enumerate(self.files):
+                kwd_violation = False
+                
+                filename, num_case = file
                 filepath = os.path.join(rootdir, 'codes', dir, filename + ".py")
-                banned_kwd_dir = os.path.join(rootdir, 'src', "{}_ban_keyword.txt".format(filename))
-                required_kwd_dir = os.path.join(rootdir, 'src', "{}_req_keyword.txt".format(filename))
-
+                
                 try:
                     with open(filepath, encoding='utf-8') as f:
                         codes = ''.join(f.readlines())
@@ -126,29 +148,23 @@ class Evaluator:
                         result.add_result(filename, case_idx, NO_FILE_SCORE, "파일 미제출")
                     continue
 
-                try:
-                    with open(banned_kwd_dir) as f:
-                        banned = f.readlines()
-                except:
-                    banned = []
-
-                try:
-                    with open(required_kwd_dir) as f:
-                        required = f.readlines()
-                except:
-                    required = []
-                
-                for kwd in banned:
-                    if kwd.strip() in codes:
+                for kwd in banned[idx]:
+                    if kwd in codes:
                         for case_idx in range(num_case):
                             result.add_result(filename, case_idx, BANNED_KWD_SCORE, f"금지 키워드({kwd}) 사용", code=codes)
-                        continue
+                        kwd_violation = True
+                        break
+                if kwd_violation:
+                    continue
                 
-                for kwd in required:
-                    if kwd.strip() not in codes:
+                for kwd in required[idx]:
+                    if kwd not in codes:
                         for case_idx in range(num_case):
                             result.add_result(filename, case_idx, NO_REQUIRED_KWD_SCORE, f"필수 키워드({kwd}) 미사용", code=codes)
-                        continue
+                        kwd_violation = True
+                        break
+                if kwd_violation:
+                    continue
 
                 for case_idx in range(num_case):
                     inputdir = os.path.join(rootdir, 'src', '{}_in_{}.txt'.format(filename, case_idx))
