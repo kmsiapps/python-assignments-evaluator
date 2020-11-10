@@ -84,21 +84,6 @@ class Evaluator:
         self.kill_timeout = kill_timeout
     
     def __run(self, filepath, inputdir, outputdir, errdir, kill_timeout):
-        try:
-            input_file = open(inputdir, 'r')
-            output_file = open(outputdir, 'w')
-            err_file = open(errdir, 'w')
-            p = subprocess.Popen(['python', filepath], stdin=input_file, stdout=output_file, stderr=err_file)
-            p.wait(timeout = kill_timeout)
-        except subprocess.TimeoutExpired:
-            p.kill()
-            input_file.close()
-            output_file.close()
-            raise TimeoutError
-        
-        input_file.close()
-        output_file.close()
-
         with open(outputdir) as f:
             output = f.read()
 
@@ -130,6 +115,43 @@ class Evaluator:
                     required[idx] = [x.strip() for x in keywords]
             except:
                 pass
+
+        total_files = []
+        for dir in self.dirs:
+            for file in self.files:
+                filename, num_case = file
+                for case_idx in range(num_case):
+                    total_files.append((dir, filename, case_idx))
+
+        # Multithreaded run
+        workers = []
+        n_thread = 32
+        for dir, filename, case_idx in total_files:
+            inputdir = os.path.join(rootdir, 'src', '{}_in_{}.txt'.format(filename, case_idx))
+            outputdir = os.path.join(rootdir, 'codes', dir, '{}_out_{}.txt'.format(filename, case_idx))
+            errdir = os.path.join(rootdir, 'codes', dir, '{}_err_{}.txt'.format(filename, case_idx))
+            ansdir = os.path.join(rootdir, 'src', "{}_ans_{}.txt".format(filename, case_idx))
+            filepath = os.path.join(rootdir, 'codes', dir, filename + ".py")
+
+            input_file = open(inputdir, 'r')
+            output_file = open(outputdir, 'w')
+            err_file = open(errdir, 'w')
+            workers.append((input_file, output_file, err_file, filename,
+                            subprocess.Popen(['python', filepath], stdin=input_file, stdout=output_file, stderr=err_file)))
+            if len(workers) >= n_thread:
+                for idx, proc in enumerate(workers):
+                    input_file, output_file, err_file, filename, p = proc
+                    try:
+                        p.wait(timeout = self.kill_timeout)
+                    except subprocess.TimeoutExpired:
+                        p.kill()
+                        input_file.close()
+                        output_file.write(f"무한루프(실행 시간 {self.kill_timeout}s 초과)")
+                        output_file.close()
+                    
+                    input_file.close()
+                    output_file.close()
+                    del(workers[idx])
                     
         for dir in self.dirs:
             result = ResultContainer(dir)
@@ -175,10 +197,10 @@ class Evaluator:
                     with open(ansdir) as f:
                         ans = f.read()
                     
-                    try:
-                        target, err = self.__run(filepath, inputdir, outputdir, errdir, self.kill_timeout)
-                    except TimeoutError:
-                        result.add_result(filename, case_idx, INF_LOOP_SCORE, f"무한루프(실행 시간 {self.kill_timeout}s 초과)", code=codes)
+                    target, err = self.__run(filepath, inputdir, outputdir, errdir, self.kill_timeout)
+
+                    if '무한루프' in target:
+                        result.add_result(filename, case_idx, INF_LOOP_SCORE, target, code=codes)
                         continue
 
                     diff = comparator.get_diff(ans, target)
