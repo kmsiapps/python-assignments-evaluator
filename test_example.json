@@ -1,0 +1,39 @@
+{
+  "name": "Example test",
+  "desc": "Example test used for testing",
+  "mandatory": false,
+  "main_task": 2,
+  "tasks": [
+    {
+      "type": "Terminal",
+      "inputs": [
+        "cp p1.py p1_bak.py"
+      ]
+    },
+    {
+      "type": "RegexReplace",
+      "from_regex": "",
+      "to_regex": ""
+    },
+    {
+      "type": "RunCmpFile",
+      "input_path": "$SOURCEDIR/blahblah",
+      "output_path": "$CODEDIR/blahblah",
+      "answer_path": "$SOURCEDIR/blahblah",
+      "ignore_capitals": true,
+      "ignore_whitespaces": true,
+      "points": {
+        "RuntimeError": 1,
+        "OutputMismatch": 2,
+        "Correct": 3
+      }
+    },
+    {
+      "type": "RunCmpStdout",
+      "input_path": "",
+      "answer_path": "",
+      "ignore_capitals": true,
+      "ignore_whitespaces": true
+    }
+  ]
+}
