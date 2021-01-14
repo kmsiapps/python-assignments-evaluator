@@ -92,7 +92,7 @@ class Evaluator:
         
         return output, err
 
-    def evaluate(self, comparator):
+    def evaluate(self, comparator, n_thread = 32):
         rootdir = os.path.join(os.getcwd(), 'labs', self.labname)
 
         banned = [[] for _ in self.files]
@@ -125,7 +125,6 @@ class Evaluator:
 
         # Multithreaded run
         workers = []
-        n_thread = 32
         for dir, filename, case_idx in total_files:
             inputdir = os.path.join(rootdir, 'src', '{}_in_{}.txt'.format(filename, case_idx))
             outputdir = os.path.join(rootdir, 'codes', dir, '{}_out_{}.txt'.format(filename, case_idx))

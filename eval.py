@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--ignore-blanks', default=True, action='store_true', help='정답 비교 시 Whitespace(\\t, \\n, 공백) 무시')
     parser.add_argument('--ignore-capitals', default=True, action='store_true', help='정답 비교 시 대/소문자 구분 안 함')
     parser.add_argument('--timeout', type=int, default=5, help='최대 실행 시간')
+    parser.add_argument('--thread', type=int, default=32, help='최대 스레드 수')
 
     args = parser.parse_args()
     labname = args.labname
@@ -31,6 +32,7 @@ def main():
     ignore_blanks = args.ignore_blanks
     ignore_capitals = args.ignore_capitals
     kill_timeout = args.timeout
+    n_thread = args.thread
 
     dirlist = tuple(
         _dir for _dir in os.listdir(os.path.join(os.getcwd(), 'labs', labname, 'codes')) \
@@ -40,7 +42,7 @@ def main():
     comparator = Comparator(ignore_blanks=ignore_blanks,
                             ignore_capitals=ignore_capitals)
     evaluator = Evaluator(dirlist, labname, files, kill_timeout)
-    evaluator.evaluate(comparator)
+    evaluator.evaluate(comparator, n_thread)
 
     htmlwriter = HTMLWriter(f"labs/{labname}/result.html")
     evaluator.save(htmlwriter)
