@@ -5,7 +5,7 @@ class Student:
     def __init__(self, name):
         self.name = name
         self.student_no = ''
-        self.directorypath = ''
+        self.directory = ''
         self.submissions = [] # list containing ProbResult
 
 class StudentResult:

@@ -12,21 +12,36 @@ class Test:
         self.desc = definition['desc']
         self.mandatory = definition['mandatory']
         self.main_task = definition['main_task']
-        self.tasks = self.build_task(definition, TaskBuilder)
+        self.tasks = self.__build_task(definition, TaskBuilder)
     
-    def build_task(self, definition: dict, taskbuilder: TaskBuilder):
+    def __build_task(self, definition: dict, taskbuilder: TaskBuilder):
         definition = DictWrapper(definition)
         return [taskbuilder.build_task(task) for task in definition.tasks]
-     
+    
+    def compare(self, testoutput: TestOutput):
+        # TODO
+        # return TestResult
+        pass
+
+
+class TestContext:
+    def __init__(self, test: Test, student: Student):
+        self.test = test
+        self.student = student
+    
     def run(self):
-        # TODO: return TestExec
-        pass
+        result = None
+        for task in self.test.tasks:
+            ret = task.run(self.student, self.test)
+            if isinstance(ret, TestResult):
+                result = ret
+        
+        if not result:
+            raise ValueError('Test must include a task that returns TestResult')
+        return result
 
-    def compare(self, test_exec: TestExec):
-        # TODO: compare self and test_exec => TestResult
-        pass
 
-class TestExec:
+class TestOutput:
     '''
     Test execution result class which consists output, err, etc.
     '''
@@ -34,19 +49,19 @@ class TestExec:
                  code: str, output: str, err: str,
                  inf_loop:bool = False):
         self.test = test
-        self.student = student
         self.output = output
         self.err = err
         self.inf_loop = inf_loop
         self.code = code
 
+
 class TestResult:
     '''
     Test evaluation result class which consists diff, score, etc.
     '''
-    def __init__(self, test: Test, test_exec: TestExec, score: float,
+    def __init__(self, test: Test, test_output: TestOutput, score: float,
                  diff: Diff, reason: str):
-        self.test_exec = test_exec
+        self.test_output = test_output
         self.score = 0
         self.diff = diff
         self.reason = reason

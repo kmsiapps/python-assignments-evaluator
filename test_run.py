@@ -8,8 +8,7 @@ from student import Student
 with open("test_example.json") as f:
     test_settings = json.loads(f.read())
 
-# TODO: Implement Various Tasks
-# TODO: Implement Test:run(), Test:compare()
+# TODO: Think an elegant way to generate TestResult? - see task.py and test.py
 # TODO: REWORK EXECUTOR AND EVALUATOR
 ex = Executor()
 ev = Evaluator()

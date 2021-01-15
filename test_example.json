@@ -6,34 +6,43 @@
   "tasks": [
     {
       "type": "Terminal",
+      "timeout": 5,
+      "terminal_alias": "cmd",
       "inputs": [
         "cp p1.py p1_bak.py"
       ]
     },
     {
       "type": "RegexReplace",
+      "target_file": "p1.py",
       "from_regex": "",
-      "to_regex": ""
+      "to_string": ""
     },
     {
       "type": "RunCmpFile",
+      "timeout": 5,
+      "interpreter_alias": "python",
       "input_path": "$SOURCEDIR/blahblah",
       "output_path": "$CODEDIR/blahblah",
       "answer_path": "$SOURCEDIR/blahblah",
+      "target_file": "p1.py",
       "ignore_capitals": true,
-      "ignore_whitespaces": true,
-      "points": {
-        "RuntimeError": 1,
-        "OutputMismatch": 2,
-        "Correct": 3
-      }
+      "ignore_whitespaces": true
     },
     {
       "type": "RunCmpStdout",
+      "timeout": 5,
+      "interpreter_alias": "python",
       "input_path": "",
       "answer_path": "",
+      "target_file": "p1.py",
       "ignore_capitals": true,
       "ignore_whitespaces": true
     }
-  ]
+  ],
+  "points": {
+    "RuntimeError": 1,
+    "OutputMismatch": 2,
+    "Correct": 3
+  }
 }

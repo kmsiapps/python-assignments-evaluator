@@ -22,3 +22,6 @@ class DictWrapper:
         if name not in self.inner:
             raise NameError(f"{name} not in dictionary")
         return self.inner[name]
+
+    def __contains__(self, name):
+        return self.inner.__contains__(name)
