@@ -4,6 +4,7 @@ import time
 
 from core.evaluate import Evaluator, Comparator
 from core.writer import HTMLWriter, CSVWriter
+from core.name_standardize import Extractor
 
 '''
 YCS1001 자동 채점 스크립트
@@ -19,6 +20,7 @@ def main():
     parser.add_argument('--file', type=str, nargs='*', required=True, help='채점할 파일명 (e.g. p2 p4)')
     parser.add_argument('--case', type=int, nargs='*', required=True, help='각 파일별 테스트 케이스 개수 (e.g. 4 3)')
 
+    parser.add_argument('--unzip-code', default=False, action='store_true', help='LearnUs 압축파일에서 코드 추출 여부')
     parser.add_argument('--ignore-blanks', default=True, action='store_true', help='정답 비교 시 Whitespace(\\t, \\n, 공백) 무시')
     parser.add_argument('--ignore-capitals', default=True, action='store_true', help='정답 비교 시 대/소문자 구분 안 함')
     parser.add_argument('--timeout', type=int, default=5, help='최대 실행 시간')
@@ -33,6 +35,12 @@ def main():
     ignore_capitals = args.ignore_capitals
     kill_timeout = args.timeout
     n_thread = args.thread
+
+    if args.unzip_code:
+        ext = Extractor(f'labs/{labname}.zip', f'labs/{labname}/codes')
+        ext.run()
+        print(f'Extraction done in {time.time() - start_time:.2f}s')
+        start_time = time.time()
 
     dirlist = tuple(
         _dir for _dir in os.listdir(os.path.join(os.getcwd(), 'labs', labname, 'codes')) \

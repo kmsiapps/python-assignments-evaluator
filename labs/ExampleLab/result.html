@@ -3,19 +3,37 @@
 <div class="student-box">
 <h3 class="student-no">2012345678</h3>
 <div class="problem-box">
-<h4 class="problem-no">p2<span class="problem-score label label-success">2/2</span></h4>
+<h4 class="problem-no">p2<span class="problem-score label label-success">2.00/2</span></h4>
 </div>
 <div class="problem-box">
-<h4 class="problem-no">p4<span class="problem-score label label-success">1/1</span></h4>
+<h4 class="problem-no">p4<span class="problem-score label label-success">1.00/1</span></h4>
+</div>
+<hr></div>
+<div class="student-box">
+<h3 class="student-no">2018765431</h3>
+<div class="problem-box">
+<h4 class="problem-no">p2<span class="problem-score label label-success">2.00/2</span></h4>
+</div>
+<div class="problem-box">
+<h4 class="problem-no">p4<span class="problem-score label label-warning">0.67/1</span></h4>
+<div class="problem-details">
+<div class="problem-result"><span class="label label-danger">#0 실행 결과 불일치</span></div>
+<pre class="diff-box"><span class="tag-insert">ba</span><span class="tag-equal">bar</span><span class="tag-replace">ian
+</span></pre>
+<pre class="ans-box">bar
+</pre>
+<details><summary>코드 보기</summary><pre class="code-box">print('babarian')
+</pre></details>
+</div>
 </div>
 <hr></div>
 <div class="student-box">
 <h3 class="student-no">2018765432</h3>
 <div class="problem-box">
-<h4 class="problem-no">p2<span class="problem-score label label-success">2/2</span></h4>
+<h4 class="problem-no">p2<span class="problem-score label label-success">2.00/2</span></h4>
 </div>
 <div class="problem-box">
-<h4 class="problem-no">p4<span class="problem-score label label-warning">0/1</span></h4>
+<h4 class="problem-no">p4<span class="problem-score label label-warning">0.67/1</span></h4>
 <div class="problem-details">
 <div class="problem-result"><span class="label label-danger">#0 실행 결과 불일치</span></div>
 <pre class="diff-box"><span class="tag-insert">ba</span><span class="tag-equal">bar</span><span class="tag-replace">ian
@@ -30,7 +48,7 @@
 <div class="student-box">
 <h3 class="student-no">2019876543</h3>
 <div class="problem-box">
-<h4 class="problem-no">p2<span class="problem-score label label-warning">0/2</span></h4>
+<h4 class="problem-no">p2<span class="problem-score label label-warning">1.33/2</span></h4>
 <div class="problem-details">
 <div class="problem-result"><span class="label label-danger">#0 실행 결과 불일치</span></div>
 <pre class="diff-box"><span class="tag-equal">Enter a character:foo foo</span><span class="tag-insert">!
@@ -46,17 +64,12 @@ print(x + ' foo!')
 </div>
 </div>
 <div class="problem-box">
-<h4 class="problem-no">p4<span class="problem-score label label-warning">0/1</span></h4>
+<h4 class="problem-no">p4<span class="problem-score label label-warning">0.67/1</span></h4>
 <div class="problem-details">
-<div class="problem-result"><span class="label label-danger">#0 실행 중 오류 발생</span></div>
+<div class="problem-result"><span class="label label-danger">#0 실행 결과 불일치</span></div>
 <pre class="diff-box"><span class="tag-delete">bar
 </span></pre>
 <pre class="ans-box">bar
-</pre>
-<pre class="alert alert-danger">Traceback (most recent call last):
-  File "C:\Users\User\Desktop\autoeval\labs\ExampleLab\codes\2019876543\p4.py", line 1, in <module>
-    print(bar)
-NameError: name 'bar' is not defined
 </pre>
 <details><summary>코드 보기</summary><pre class="code-box">print(bar)
 </pre></details>
