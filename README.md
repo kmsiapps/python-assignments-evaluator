@@ -1,9 +1,19 @@
 ## YCS1001 Auto Evaluator
 
-Usage: `python eval.py LABNAME --file p2 p4 --case 4 3 --ignore-blanks --ignore-capitals --timeout 5`
+Usage: `python eval.py LABNAME --file p2 p4 --case 2 1 --ignore-blanks --ignore-capitals --timeout 5 --thread 32 --unzip-code`
+
+```
+--file 옵션 이후에는 채점할 파일명들을 순서대로 넣어주세요.
+--case 옵션 이후에는 각 파일명별 테스트 케이스 수를 순서대로 넣어주세요
+--ignore-blanks, ignore-capitals: 채점 시 결과에서 정답과 비교 시 공백, 대/소문자 구분 여부입니다.
+--timeout: 해당 시간 이후에 무한루프로 판정합니다. 초 단위입니다.
+--thread: 동시 실행할 스레드 수입니다. 파일 접근 등 lock이 필요한 경우 1로 두시면 (속도는 느려지지만) 됩니다.
+--unzip-code: LearnUs에서 다운로드받은 제출물 압축파일에서 코드를 가져옵니다. labs 폴더에 LABNAME.zip 으로 두어야 합니다.
+```
 
 ```
 labs: 특정 주차의 채점용 파일들이 폴더로 들어 있습니다.
+    Lab1.zip : LearnUs에서 받은 제출물 모두 다운로드받기 압축 파일입니다.
     Lab1/ : 주차명은 마음대로 해도 되지만, 프로그램 실행 시 입력해야 합니다.
         codes/ : 채점할 코드를 넣는 폴더입니다.
             Lab1/
