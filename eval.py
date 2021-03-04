@@ -37,10 +37,13 @@ def main():
     n_thread = args.thread
 
     if args.unzip_code:
-        ext = Extractor(f'labs/{labname}.zip', f'labs/{labname}/codes')
-        ext.run()
-        print(f'Extraction done in {time.time() - start_time:.2f}s')
-        start_time = time.time()
+        if os.path.exists(f'labs/{labname}/codes'):
+            print(f'labs/{labname}/codes folder exists - aborting extraction')
+        else:
+            ext = Extractor(f'labs/{labname}.zip', f'labs/{labname}/codes')
+            ext.run()
+            print(f'Extraction done in {time.time() - start_time:.2f}s')
+            start_time = time.time()
 
     dirlist = tuple(
         _dir for _dir in os.listdir(os.path.join(os.getcwd(), 'labs', labname, 'codes')) \
