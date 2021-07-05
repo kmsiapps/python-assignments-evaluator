@@ -1,1 +1,1 @@
-Enter a character:Enter a character:foo foofoo
+Enter a character:foofoo

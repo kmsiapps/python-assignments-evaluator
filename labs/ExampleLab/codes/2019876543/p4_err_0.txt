@@ -1,4 +1,4 @@
 Traceback (most recent call last):
-  File "C:\Users\Hanju\Desktop\python-assignments-evaluator-2\labs\ExampleLab\codes\2019876543\p4.py", line 1, in <module>
+  File "C:\Users\car10\Documents\GitHub\YCS1001-Auto-Evaluator\labs\ExampleLab\codes\2019876543\p4.py", line 1, in <module>
     print(bar)
 NameError: name 'bar' is not defined

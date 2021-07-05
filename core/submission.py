@@ -1,7 +1,6 @@
 import os
 from core.student import Student
 from core.problem import Problem
-from core.task.task import Task
 
 class Submission:
     '''
@@ -27,27 +26,13 @@ class Submission:
         self.directory = directory
         self.student = student
 
-        # Tasks that are run beforehand. Executed sequentially.
-        self.pretasks = []
-
         # List of Problem instance, which is run in parallel.
         self.problems = []
 
-        # Tasks which are executed sequentially,
-        # after all problems are evaluated.
-        self.posttasks = []
 
     def add_problem(self, problem:Problem):
         if not isinstance(problem, Problem):
             raise TypeError("add_problem: Given arg should be Problem instance")
+        problem.set_submission(self)
         self.problems.append(problem)
     
-    def add_pretask(self, task:Task):
-        if not isinstance(task, Task):
-            raise TypeError("add_pretask: Given arg should be Task instance")
-        self.pretasks.append(task)
-
-    def add_posttask(self, task:Task):
-        if not isinstance(task, Task):
-            raise TypeError("add_posttask: Given arg should be Task instance")
-        self.posttasks.append(task)

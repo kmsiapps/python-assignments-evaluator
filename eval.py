@@ -1,3 +1,4 @@
+from core.task.task import Task
 import os
 import argparse
 import time
@@ -5,9 +6,9 @@ import time
 from core.student import Student
 from core.submission import Submission
 from core.problem import Problem
-from core.definition.task_type import OutputType
-from core.task.runpy import RunPyTask
+from core.task.runexec import RunExecutableTask, OutputType
 from core.utils.name_standardize import Extractor
+from core.utils.parse_dir import parse_dir
 
 '''
 YCS1001 자동 채점 스크립트
@@ -56,45 +57,58 @@ def main():
     '''
     Initial test code
     '''
-
     submission_lst = []
     for dir in dirlist:
         student = Student('John doe', dir)
         submission = Submission(os.path.join(os.getcwd(), 'labs', labname, 'codes', dir), student)
-        problem = Problem('p2', {})
-        problem.add_tasks(RunPyTask(0, 'foo foo', 'Prints "foo foo".',
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p2.py'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'src', 'p2_ans_0.txt'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p2_out_0.txt'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p2_err_0.txt'),
-                                       OutputType.STDOUT
+        problem = Problem('p2')
+        problem.add_tasks(RunExecutableTask(0, 'foo foo', 'Prints "foo foo".', 'python',
+                                       parse_dir('$SOURCEDIR$/p2_in_0.txt', submission),
+                                       parse_dir('$SOURCEDIR$/p2_ans_0.txt', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p2.py', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p2_out_0.py', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p2_err_0.py', submission),
+                                       OutputType.STDOUT,
+                                       1
                                        ))
-        problem.add_tasks(RunPyTask(1, 'bar foo', 'Prints "bar foo".',
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p2.py'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'src', 'p2_ans_1.txt'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p2_out_1.txt'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p2_err_1.txt'),
-                                       OutputType.STDOUT
+        problem.add_tasks(RunExecutableTask(1, 'bar foo', 'Prints "bar foo".', 'python',
+                                       parse_dir('$SOURCEDIR$/p2_in_1.txt', submission),
+                                       parse_dir('$SOURCEDIR$/p2_ans_1.txt', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p2.py', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p2_out_1.py', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p2_err_1.py', submission),
+                                       OutputType.STDOUT,
+                                       1
                                        ))
         submission.add_problem(problem)
-        problem = Problem('p4', {})
-        problem.add_tasks(RunPyTask(0, 'bar', 'Prints "bar".',
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p4.py'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'src', 'p4_ans_0.txt'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p4_out_0.txt'),
-                                       os.path.join(os.getcwd(), 'labs', labname, 'codes', dir, 'p4_err_0.txt'),
-                                       OutputType.STDOUT
+        problem = Problem('p4')
+        problem.add_tasks(RunExecutableTask(0, 'bar', 'Prints "bar".', 'python',
+                                       parse_dir('$SOURCEDIR$/p4_in_0.txt', submission),
+                                       parse_dir('$SOURCEDIR$/p4_ans_0.txt', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p4.py', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p4_out_0.py', submission),
+                                       parse_dir('$SUBMISSIONDIR$/p4_err_0.py', submission),
+                                       OutputType.STDOUT,
+                                       1
                                        ))
         submission.add_problem(problem)
         submission_lst.append(submission)
+    
+    results = []
     
     for s in submission_lst:
         for p in s.problems:
             for t in p.tasks:
                 t.run(os.path.join(os.getcwd(), 'labs', labname, 'codes', s.student.id))
-                t.wait(3)
+                t.wait()
+                results.append(t.get_result())
     
     print("Evaluation done in {:.2f}s".format(time.time() - start_time))
+
+    for result in results:
+        t:Task = result.task
+        p:Problem = t.problem
+        print(f'{p.student.name}::{p.name}::{t.name} => {t.status.name}')
 
 
 if __name__ == "__main__":

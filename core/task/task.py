@@ -10,3 +10,6 @@ class Task:
     
     def wait(self, timeout:int):
         raise NotImplementedError()
+    
+    def set_problem(self, problem):
+        self.problem = problem
