@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\Users\Hanju\Desktop\python-assignments-evaluator-2\labs\ExampleLab\codes\2019876543\p4.py", line 1, in <module>
+    print(bar)
+NameError: name 'bar' is not defined
