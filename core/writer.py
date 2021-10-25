@@ -31,29 +31,45 @@ class HTMLWriter(Writer):
                 else:
                     label_suffix = 'warning'
                     show_details = True
-                acc.append(f'<h4 class="problem-no">{problem}' +
+                acc.append(f'<h4 data-toggle="collapse" class="problem-no" href="#collapse_{individuals.get_name()}_{problem}">&gt; {problem}' +
                            '<span class="problem-score label label-{}">{:.2f}/{}'.format(
                                          label_suffix, individuals[problem].get_score()/PROBLEM_MAX_SCORE, individuals[problem].length()) +
                             '</span></h4>')
                 if (show_details):
-                    acc.append('<div class="problem-details">')
-                    code = None
-                    for case_idx, case in enumerate(individuals[problem]):
-                        score, reason, diff, ans, __code, err = individuals[problem][case]
-                        if __code:
-                            code = __code
-                        if (score == 3):
-                            continue
-                        acc.append(f'<div class="problem-result"><span class="label label-danger">#{case_idx} {reason}</span></div>')
-                        if (diff):
-                            acc.append(f'<pre class="diff-box">{diff.to_html()}</pre>')
-                        if (ans):
-                            acc.append(f'<pre class="ans-box">{ans}</pre>')
-                        if (err):
-                            acc.append(f'<pre class="alert alert-danger">{self.to_html_char(err)}</pre>')
-                    if (code):
-                        acc.append(f'<details><summary>코드 보기</summary><pre class="code-box">{self.to_html_char(code)}</pre></details>')
+                    collapse_classname = 'collapse in'
+                else:
+                    collapse_classname = 'collapse'
+                acc.append(f'<div class="{collapse_classname} problem-details" id="collapse_{individuals.get_name()}_{problem}">')
+                code = None
+                for case_idx, case in enumerate(individuals[problem]):
+                    score, reason, diff, ans, __code, err = individuals[problem][case]
+                    if __code:
+                        code = __code
+                    if (score == 3):
+                        collapse_classname = 'collapse'
+                        label_suffix = 'success'
+                    else:
+                        collapse_classname = 'collapse in'
+                        label_suffix = 'danger'
+                    acc.append('<div class="problem-result">'
+                                f'<span class="label label-{label_suffix}"'
+                                'data-toggle="collapse"'
+                                f'href="#collapse_{individuals.get_name()}_{problem}_{case_idx}"'
+                                f'>&gt; #{case_idx} {reason}'
+                                '</span></div>')
+                    acc.append(f'<div class="{collapse_classname} details-box" id="collapse_{individuals.get_name()}_{problem}_{case_idx}">')
+                    if (diff):
+                        acc.append(f'<pre class="diff-box">{diff.to_html()}</pre>')
+                    elif (score == 3):
+                        acc.append(f'<pre class="diff-box">{ans}</pre>')
+                    if (ans):
+                        acc.append(f'<pre class="ans-box">{ans}</pre>')
+                    if (err):
+                        acc.append(f'<pre class="alert alert-danger">{self.to_html_char(err)}</pre>')
                     acc.append('</div>')
+                if (code):
+                    acc.append(f'<details><summary>코드 보기</summary><pre class="code-box">{self.to_html_char(code)}</pre></details>')
+                acc.append('</div>')
                 acc.append('</div>')
             acc.append('<hr></div>')
         acc.append('</div>')
@@ -64,13 +80,17 @@ class HTMLWriter(Writer):
     
     def __save(self):
         content = \
-'''<html><head><link rel="stylesheet" type="text/css" href="../../static/style.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"></head><body>'''
+'''<html><head>
+<link rel="stylesheet" type="text/css" href="../../static/style.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head><body>'''
 
         content += self.content
         content += '</body></html>'
 
-        with open(self.filename, 'w') as f:
+        with open(self.filename, 'w', encoding='utf-8') as f:
             f.write(content)
 
 
