@@ -187,7 +187,8 @@ class Evaluator:
         for dir in self.dirs:
             result = ResultContainer(dir)
             for idx, file in enumerate(self.files):
-                kwd_violation = False
+                req_kwd_violation = False
+                banned_kwd_violation = False
                 
                 filename, num_case = file
                 filepath = os.path.join(rootdir, 'codes', dir, filename + ".py")
@@ -203,21 +204,13 @@ class Evaluator:
 
                 for kwd in banned[idx]:
                     if kwd in codes:
-                        for case_idx in range(num_case):
-                            result.add_result(filename, case_idx, BANNED_KWD_SCORE, f"금지 키워드({kwd}) 사용", code=codes)
-                        kwd_violation = True
+                        banned_kwd_violation = True
                         break
-                if kwd_violation:
-                    continue
                 
                 for kwd in required[idx]:
                     if kwd not in codes:
-                        for case_idx in range(num_case):
-                            result.add_result(filename, case_idx, NO_REQUIRED_KWD_SCORE, f"필수 키워드({kwd}) 미사용", code=codes)
-                        kwd_violation = True
+                        req_kwd_violation = True
                         break
-                if kwd_violation:
-                    continue
 
                 for case_idx in range(num_case):
                     inputdir = os.path.join(rootdir, 'src', '{}_in_{}.txt'.format(filename, case_idx))
@@ -232,9 +225,13 @@ class Evaluator:
 
                     diff = comparator.get_diff(ans, target)
                     if (diff == None):
-                        result.add_result(filename, case_idx, PROBLEM_MAX_SCORE)
+                        result.add_result(filename, case_idx, PROBLEM_MAX_SCORE, ans=ans, code=codes)
+                    elif req_kwd_violation:
+                        result.add_result(filename, case_idx, NO_REQUIRED_KWD_SCORE, f"필수 키워드({kwd}) 미사용", diff=diff, ans=ans, code=codes)
+                    elif banned_kwd_violation:
+                        result.add_result(filename, case_idx, BANNED_KWD_SCORE, f"금지 키워드({kwd}) 사용", diff=diff, ans=ans, code=codes)
                     elif target[:4] == '무한루프':
-                        result.add_result(filename, case_idx, INF_LOOP_SCORE, f"무한루프(실행 시간 {self.kill_timeout}s 초과)\n", diff=diff, code=codes)
+                        result.add_result(filename, case_idx, INF_LOOP_SCORE, f"무한루프(실행 시간 {self.kill_timeout}s 초과)\n", diff=diff, ans=ans, code=codes)
                     elif err:
                         result.add_result(filename, case_idx, STDOUT_ERR_SCORE, "실행 중 오류 발생", diff=diff, ans=ans, code=codes, err=err)
                     else:
