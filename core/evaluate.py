@@ -224,9 +224,7 @@ class Evaluator:
                     target, err = self.__run(filepath, inputdir, outputdir, errdir, self.kill_timeout)
 
                     diff = comparator.get_diff(ans, target)
-                    if (diff == None):
-                        result.add_result(filename, case_idx, PROBLEM_MAX_SCORE, ans=ans, code=codes)
-                    elif req_kwd_violation:
+                    if req_kwd_violation:
                         result.add_result(filename, case_idx, NO_REQUIRED_KWD_SCORE, f"필수 키워드({kwd}) 미사용", diff=diff, ans=ans, code=codes)
                     elif banned_kwd_violation:
                         result.add_result(filename, case_idx, BANNED_KWD_SCORE, f"금지 키워드({kwd}) 사용", diff=diff, ans=ans, code=codes)
@@ -234,6 +232,8 @@ class Evaluator:
                         result.add_result(filename, case_idx, INF_LOOP_SCORE, f"무한루프(실행 시간 {self.kill_timeout}s 초과)\n", diff=diff, ans=ans, code=codes)
                     elif err:
                         result.add_result(filename, case_idx, STDOUT_ERR_SCORE, "실행 중 오류 발생", diff=diff, ans=ans, code=codes, err=err)
+                    elif diff == None:
+                        result.add_result(filename, case_idx, PROBLEM_MAX_SCORE, ans=ans, code=codes)
                     else:
                         result.add_result(filename, case_idx, INTERPRET_ERR_SCORE, "실행 결과 불일치", diff=diff, ans=ans, code=codes) # 일반적으로 2점
             
