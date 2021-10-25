@@ -202,6 +202,10 @@ class Evaluator:
                         result.add_result(filename, case_idx, INF_LOOP_SCORE, target, code=codes)
                         continue
 
+                    MAX_OUTPUT_LENGTH = 1024
+                    if len(target) > MAX_OUTPUT_LENGTH:
+                        target = target[:MAX_OUTPUT_LENGTH]
+
                     diff = comparator.get_diff(ans, target)
                     if (diff == None):
                         result.add_result(filename, case_idx, PROBLEM_MAX_SCORE)
