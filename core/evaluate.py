@@ -1,6 +1,7 @@
 import re
 import os
 import subprocess
+import time
 from difflib import SequenceMatcher
 from core.score_definition import *
 from core.writer import HTMLWriter, CSVWriter
@@ -91,6 +92,38 @@ class Evaluator:
             err = f.read()
         
         return output, err
+    
+    def wait_workers(self, workers):
+        new_workers = workers
+        for idx, proc in enumerate(workers):
+            input_file, output_file, err_file, filename, p, start_time, outputdir = proc
+            try:
+                wait_time = self.kill_timeout - time.time() + start_time
+                wait_time = max(wait_time, 0.1)
+                p.wait(timeout = wait_time)
+            except subprocess.TimeoutExpired:
+                p.kill()
+                input_file.close()
+                output_file.close()
+
+                output_text = ''
+                with open(outputdir, 'r') as output_file:
+                    try:
+                        # Read first 20 lines only
+                        for _ in range(20):
+                            output_text += str(next(output_file))
+                    except StopIteration:
+                        pass
+
+                print(f'Timeout! {outputdir}')
+                output_file = open(outputdir, 'w')                   
+                output_file.write(f"무한루프(실행 시간 {self.kill_timeout}s 초과)\n")
+                output_file.write(output_text)
+                
+                input_file.close()
+                output_file.close()
+            del(new_workers[idx])
+        return workers
 
     def evaluate(self, comparator, n_thread = 32):
         rootdir = os.path.join(os.getcwd(), 'labs', self.labname)
@@ -135,23 +168,22 @@ class Evaluator:
             input_file = open(inputdir, 'r')
             output_file = open(outputdir, 'w')
             err_file = open(errdir, 'w')
-            workers.append((input_file, output_file, err_file, filename,
-                            subprocess.Popen(['python', filepath], stdin=input_file, stdout=output_file, stderr=err_file)))
-            if len(workers) >= n_thread:
-                for idx, proc in enumerate(workers):
-                    input_file, output_file, err_file, filename, p = proc
-                    try:
-                        p.wait(timeout = self.kill_timeout)
-                    except subprocess.TimeoutExpired:
-                        p.kill()
-                        input_file.close()
-                        output_file.write(f"무한루프(실행 시간 {self.kill_timeout}s 초과)")
-                        output_file.close()
-                    
-                    input_file.close()
-                    output_file.close()
-                    del(workers[idx])
-                    
+            workers.append((input_file,
+                            output_file,
+                            err_file,
+                            filename,
+                            subprocess.Popen(['python', filepath], stdin=input_file, stdout=output_file, stderr=err_file),
+                            time.time(),
+                            outputdir)
+                           )
+            while len(workers) >= n_thread:
+                workers = self.wait_workers(workers)
+
+        # wait last threads
+        while len(workers) > 0:
+            workers = self.wait_workers(workers)
+
+        print('Test runs done')
         for dir in self.dirs:
             result = ResultContainer(dir)
             for idx, file in enumerate(self.files):
@@ -198,17 +230,11 @@ class Evaluator:
                     
                     target, err = self.__run(filepath, inputdir, outputdir, errdir, self.kill_timeout)
 
-                    if '무한루프' in target:
-                        result.add_result(filename, case_idx, INF_LOOP_SCORE, target, code=codes)
-                        continue
-
-                    MAX_OUTPUT_LENGTH = 1024
-                    if len(target) > MAX_OUTPUT_LENGTH:
-                        target = target[:MAX_OUTPUT_LENGTH]
-
                     diff = comparator.get_diff(ans, target)
                     if (diff == None):
                         result.add_result(filename, case_idx, PROBLEM_MAX_SCORE)
+                    elif target[:4] == '무한루프':
+                        result.add_result(filename, case_idx, INF_LOOP_SCORE, f"무한루프(실행 시간 {self.kill_timeout}s 초과)\n", diff=diff, code=codes)
                     elif err:
                         result.add_result(filename, case_idx, STDOUT_ERR_SCORE, "실행 중 오류 발생", diff=diff, ans=ans, code=codes, err=err)
                     else:
