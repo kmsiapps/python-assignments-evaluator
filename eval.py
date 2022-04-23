@@ -21,8 +21,8 @@ def main():
     parser.add_argument('--case', type=int, nargs='*', required=True, help='각 파일별 테스트 케이스 개수 (e.g. 4 3)')
 
     parser.add_argument('--unzip-code', default=False, action='store_true', help='LearnUs 압축파일에서 코드 추출 여부')
-    parser.add_argument('--ignore-blanks', default=True, action='store_true', help='정답 비교 시 Whitespace(\\t, \\n, 공백) 무시')
-    parser.add_argument('--ignore-capitals', default=True, action='store_true', help='정답 비교 시 대/소문자 구분 안 함')
+    parser.add_argument('--ignore-blanks', default=False, action='store_true', help='정답 비교 시 Whitespace(\\t, \\n, 공백) 무시')
+    parser.add_argument('--ignore-capitals', default=False, action='store_true', help='정답 비교 시 대/소문자 구분 안 함')
     parser.add_argument('--timeout', type=float, default=5, help='최대 실행 시간')
     parser.add_argument('--thread', type=int, default=32, help='최대 스레드 수')
 
