@@ -3,8 +3,8 @@
 Usage: `python eval.py LABNAME --file p2 p4 --case 2 1 --ignore-blanks --ignore-capitals --timeout 5 --thread 32 --unzip-code`
 
 ```
---file 옵션 이후에는 채점할 파일명들을 순서대로 넣어주세요.
---case 옵션 이후에는 각 파일명별 테스트 케이스 수를 순서대로 넣어주세요
+--file 옵션 이후에는 채점할 파일명들을 순서대로 넣어주세요. (생략 시 자동 인식)
+--case 옵션 이후에는 각 파일명별 테스트 케이스 수를 순서대로 넣어주세요 (생략 시 자동 인식)
 --ignore-blanks, ignore-capitals: 채점 시 결과에서 정답과 비교 시 공백, 대/소문자 구분 여부입니다.
 --timeout: 해당 시간 이후에 무한루프로 판정합니다. 초 단위입니다.
 --thread: 동시 실행할 스레드 수입니다. 파일 접근 등 lock이 필요한 경우 1로 두시면 (속도는 느려지지만) 됩니다.
